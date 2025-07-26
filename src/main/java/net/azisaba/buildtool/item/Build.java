@@ -5,7 +5,6 @@ import net.azisaba.buildtool.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -28,12 +27,10 @@ public class Build {
         meta.getPersistentDataContainer().set(Constants.BUILD_TOOL_KEY, PersistentDataType.INTEGER, 1);
         meta.setUnbreakable(true);
         meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
         meta.setCustomModelData(modelData);
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&e&lBuild&f&l-&b&lTool"));
         meta.setLore(LORE);
         item.setItemMeta(meta);
-
         return item;
     }
 }

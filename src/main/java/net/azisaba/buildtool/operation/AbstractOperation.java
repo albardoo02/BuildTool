@@ -1,5 +1,6 @@
 package net.azisaba.buildtool.operation;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -18,12 +19,14 @@ public abstract class AbstractOperation implements Operation {
     protected final Map.Entry<Integer, StorageBox> storageBoxEntry;
     protected Block startBlock;
     protected long amountToPlace;
+    protected long availableAmount;
 
-    public AbstractOperation(Block startBlock, BlockFace face, long amountToPlace, Player player, boolean useStorageBox, Map.Entry<Integer, StorageBox> storageBoxEntry) {
+    public AbstractOperation(Block startBlock, BlockFace face, long desiredAmount, long availableAmount, Player player, boolean useStorageBox, Map.Entry<Integer, StorageBox> storageBoxEntry) {
         this.startBlock = startBlock;
         this.material = startBlock.getType();
         this.face = face;
-        this.amountToPlace = amountToPlace;
+        this.amountToPlace = desiredAmount;
+        this.availableAmount = availableAmount;
         this.player = player;
         this.useStorageBox = useStorageBox;
         this.storageBoxEntry = storageBoxEntry;
@@ -31,6 +34,10 @@ public abstract class AbstractOperation implements Operation {
 
     @Override
     public void subtract() {
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            return;
+        }
+
         if (useStorageBox) {
             StorageBox storage = this.storageBoxEntry.getValue();
             if (storage != null && !storage.isEmpty() && storage.getComponentItemStack() != null && !storage.getComponentItemStack().hasItemMeta()) {

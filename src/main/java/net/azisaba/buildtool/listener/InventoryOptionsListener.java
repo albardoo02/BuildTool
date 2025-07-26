@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -47,12 +48,14 @@ public class InventoryOptionsListener implements Listener, InventoryHolder {
         PlayerData data = playerManager.getPlayerData(player.getUniqueId());
         int slot = event.getSlot();
 
-        setAmount(clicked, event);
-
         Operation.OperationType type = Util.getOperationTypeFromSlot(slot);
         if (type != null) {
+            setAmount(clicked, event, type);
             data.setOperationType(type);
+            data.setOperationAmount(clicked.getAmount());
+            enchantItem(event.getInventory(), clicked);
         }
+
         data.setOperationAmount(clicked.getAmount());
 
         enchantItem(event.getInventory(), clicked);
@@ -84,11 +87,8 @@ public class InventoryOptionsListener implements Listener, InventoryHolder {
         return data.getOptionsInventory();
     }
 
-    private void setAmount(ItemStack clicked, InventoryClickEvent e) {
-        int edit = 1;
-        if (e.isRightClick()) {
-            edit = -1;
-        }
+    private void setAmount(ItemStack clicked, InventoryClickEvent e, Operation.OperationType type) {
+        int edit = e.isRightClick() ? -1 : 1;
         if (e.isShiftClick()) {
             edit *= 5;
         }
@@ -96,9 +96,13 @@ public class InventoryOptionsListener implements Listener, InventoryHolder {
         int currentAmount = clicked.getAmount();
         int newAmount = currentAmount + edit;
 
-        if (newAmount > 64) newAmount = 1;
-        if (newAmount < 1) newAmount = 64;
-
+        if (type == Operation.OperationType.SQUARE_BLOCK_PLACE) {
+            if (newAmount > 4) newAmount = 1;
+            if (newAmount < 1) newAmount = 4;
+        } else {
+            if (newAmount > 64) newAmount = 1;
+            if (newAmount < 1) newAmount = 64;
+        }
         clicked.setAmount(newAmount);
     }
 
@@ -109,6 +113,9 @@ public class InventoryOptionsListener implements Listener, InventoryHolder {
             }
         }
         item.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+        ItemMeta meta = item.getItemMeta();
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        item.setItemMeta(meta);
     }
 
     @Override

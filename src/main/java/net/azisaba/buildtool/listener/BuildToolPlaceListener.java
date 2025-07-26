@@ -9,6 +9,7 @@ import net.azisaba.buildtool.operation.SquareBlockPlace;
 import net.azisaba.buildtool.util.Constants;
 import net.azisaba.buildtool.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -60,8 +61,15 @@ public class BuildToolPlaceListener implements Listener {
 
         Material targetMaterial = clicked.getType();
         Map.Entry<Integer, StorageBox> sbEntry = getStorageBox(player, targetMaterial);
-        long totalAmount = calculateTotalAmount(player, targetMaterial, sbEntry);
 
+        boolean useStorageBoxForItem = (sbEntry != null);
+
+        long totalAmount;
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            totalAmount = Integer.MAX_VALUE;
+        } else {
+            totalAmount = calculateTotalAmount(player, targetMaterial, sbEntry);
+        }
         if (totalAmount == 0) {
             return;
         }
@@ -73,9 +81,9 @@ public class BuildToolPlaceListener implements Listener {
 
         Operation operation;
         if (type == Operation.OperationType.SQUARE_BLOCK_PLACE) {
-            operation = new SquareBlockPlace(clicked, face, amountToPlace, player, plugin.isStorageBoxEnabled(), sbEntry);
+            operation = new SquareBlockPlace(clicked, face, amountToPlace, totalAmount, player, useStorageBoxForItem, sbEntry);
         } else {
-            operation = new LongLengthPlace(clicked, face, amountToPlace, player, plugin.isStorageBoxEnabled(), sbEntry);
+            operation = new LongLengthPlace(clicked, face, amountToPlace, totalAmount, player, useStorageBoxForItem, sbEntry);
         }
         operation.place();
 
