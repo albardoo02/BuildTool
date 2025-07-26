@@ -1,0 +1,14 @@
+name: BuildTool
+version: '${project.version}'
+main: net.azisaba.buildtool.BuildTool
+api-version: '1.15'
+softdepend:
+  - StorageBox
+
+commands:
+  giveBuildTool:
+    permission: BuildTool.command.giveBuildTool
+
+permissions:
+  BuildTool.command.giveBuildTool:
+    default: op
